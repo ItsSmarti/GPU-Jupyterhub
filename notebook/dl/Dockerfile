@@ -130,6 +130,11 @@ RUN conda install --yes \
 RUN pip install --no-cache-dir \
   tensorflow-gpu==2.10.0 \
   tensorboard
+# install pytorch-forecasting, pytorch-lightning
+# https://pypi.org/project/tensorflow-gpu/
+RUN pip install --no-cache-dir \
+  pytorch-lightning \
+  pytorch-forecasting
 # no need to version these other things, but we will add them after the others so we get the latest
 # when the cache is busted
 RUN conda install --yes \
@@ -145,6 +150,8 @@ RUN conda install --yes \
     nose \
     numpy \
     pandas \
+    polars \
+    pyarrow \
     pandarallel \
     path.py \
     Pillow \
@@ -165,22 +172,6 @@ RUN conda install --yes \
 
 # # to get the lab extension working with lab v3, we have to install directly from git
 RUN pip install --no-cache-dir git+https://github.com/twalcari/jupyterlab_tensorboard.git
-
-# We'll install geopandas in a separate env because its dependencies are pretty different
-# https://anaconda.org/conda-forge/geopandas
-RUN conda create -n geopandas \
-    ipykernel \
-    geopandas=0.11.1 \
-    pandas \
-    pandarallel \
-    scikit-image \
-    scikit-learn \
-    scipy \
-    matplotlib
-RUN conda run -n geopandas ipython kernel install --user --name=geopandas
-COPY geopandas_32.png /home/deep/.local/share/jupyter/kernels/geopandas/logo-32x32.png
-COPY geopandas_64.png /home/deep/.local/share/jupyter/kernels/geopandas/logo-64x64.png
-RUN rm /home/deep/.local/share/jupyter/kernels/geopandas/logo-svg.svg
 
 RUN conda build purge-all
 RUN conda init bash
